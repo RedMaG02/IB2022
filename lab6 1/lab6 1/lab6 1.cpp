@@ -7,12 +7,12 @@
 using namespace std;
 
 
-bool CheckSystem(vector<vector<bool>> a, vector<int> ls, vector<int> lo, int n, int m)
+bool CheckSystem(vector<vector<bool>> a, vector<int> ls, vector<int> lo)
 {
     // w = true r = false
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < ls.size(); i++)
     {
-        for (int j = 0; j < m; j++)
+        for (int j = 0; j < lo.size(); j++)
         {
             if (!((ls[i] > lo[j] && a[i][j]) || (ls[i] <= lo[j] && !(a[i][j]))))
             {
