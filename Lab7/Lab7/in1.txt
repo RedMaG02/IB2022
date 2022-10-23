@@ -1,0 +1,6 @@
+4
+5
+r w c; r c; r; c; r w;
+c w; t c; w; c; t;
+r ; r c; r; r; r w;
+c w; t r c; w; t; t;
