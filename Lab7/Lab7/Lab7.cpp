@@ -260,6 +260,11 @@ public:
 
     }
 
+    HarrisonModel GetSystemH()
+    {
+        return systemH;
+    }
+
     void CommandsInterpreter()
     {
         ifstream input(commandsInputPath);
@@ -353,11 +358,193 @@ public:
 };
 
 
+//a) список объектов, доступ к которым не задан никакому субъекту(ни
+//по чтению, ни по записи);
+//b) список субъектов, не обращающихся ни к каким объектам(ни по
+//чтению, ни по записи);
+//c) список субъектов, имеющих полный доступ ко всем объектам;
+//d) список C1, C2, …, Ct, где Ci – список субъектов, которые все имеют
+//право записи в некоторый один объект oj(т.е.все субъекты из Ci могут
+//    вступить в потенциальный конфликт при одновременной записи в объект oj);
+//e) список субъектов, каждый из которых имеет полный доступ только к
+//одному объекту, а к другим объектам доступа либо нет, либо только право
+//чтения.
+class HarrisonSelect
+{
+public:
+    HarrisonModel systemH;
+
+    HarrisonSelect()
+    {
+        this->systemH = HarrisonModel();
+    };
+
+    HarrisonSelect(HarrisonModel system)
+    {
+        this->systemH = system;
+    };
+
+    vector<int> GetFreeObjects()
+    {
+        vector<int> objects;
+
+        for (int j = 0; j < systemH.m; j++)
+        {
+            bool flag = true;
+
+            for (int i = 0; i < systemH.n; i++)
+            {
+                if (!systemH.matrix[i][j].empty())
+                {
+                    flag = false;
+                }
+            }
+            if (flag)
+            {
+                objects.push_back(systemH.idObject[j]);
+            }
+        }
+        return objects;
+    }
+
+    vector<int> GetFreeSubjects()
+    {
+        vector<int> subjects;
+
+        for (int i = 0; i < systemH.n; i++)
+        {
+            bool flag = true;
+
+            for (int j = 0; j < systemH.m; j++)
+            {
+                if (!systemH.matrix[i][j].empty())
+                {
+                    flag = false;
+                }
+            }
+            if (flag)
+            {
+                subjects.push_back(systemH.idSubject[i]);
+            }
+        }
+        return subjects;
+    }
+
+    vector<int> GetFullSubjects()
+    {
+        vector<int> subjects;
+
+        for (int i = 0; i < systemH.n; i++)
+        {
+            bool flag = true;
+
+            for (int j = 0; j < systemH.m; j++)
+            {
+                if (systemH.matrix[i][j].find('r') == systemH.matrix[i][j].end() || systemH.matrix[i][j].find('w') == systemH.matrix[i][j].end())
+                {
+                    flag = false;
+                }
+            }
+            if (flag)
+            {
+                subjects.push_back(systemH.idSubject[i]);
+            }
+        }
+        return subjects;
+    }
+
+    vector<vector<int>> GetSubjectsLists()
+    {
+        vector<vector<int>> subjectsLists;
+
+        for (int j = 0; j < systemH.m; j++)
+        {
+            vector<int> tempSubjects;
+
+            for (int i = 0; i < systemH.n; i++)
+            {
+                if (systemH.matrix[i][j].find('w') != systemH.matrix[i][j].end())
+                {
+                    tempSubjects.push_back(systemH.idSubject[i]);
+                }
+            }
+
+            subjectsLists.push_back(tempSubjects);
+        }
+        return subjectsLists;
+    }
+
+    vector<int> GetSubjectsOneFullObject()
+    {
+        vector<int> subjects;
+
+        for (int i = 0; i < systemH.n; i++)
+        {
+            bool flag1 = false;
+            bool flag2 = true;
+
+            for (int j = 0; j < systemH.m; j++)
+            {
+                if (systemH.matrix[i][j].find('r') != systemH.matrix[i][j].end() && systemH.matrix[i][j].find('w') != systemH.matrix[i][j].end())
+                {
+                    if (flag1 == false)
+                    {
+                        flag1 = true;
+                    }
+                    else
+                    {
+                        flag2 = false;
+                    }
+                }
+            }
+
+            if (flag1 && flag2)
+            {
+                subjects.push_back(systemH.idSubject[i]);
+            }
+        }
+
+        return subjects;
+    }
+
+};
+
+ostream& operator<<(ostream& os, const vector<int>& input)
+{
+    for (auto const& i : input)
+    {
+        os << i << " ";
+    }
+    return os;
+}
+
+ostream& operator<<(ostream& os, const vector<vector<int>>& input)
+{
+    for (int i = 0; i < input.size(); i++)
+    {
+        for (int j = 0; j < input[i].size(); j++)
+        {
+            os << input[i][j] << " ";
+        }
+        os << endl;
+    }
+    return os;
+}
+
+
 int main()
 {
     InterpreterForHarrison test = InterpreterForHarrison("in1.txt", "in2.txt", "out.txt");
     test.CommandsInterpreter();
     test.TypeSystem();
+    HarrisonSelect selectTest = HarrisonSelect(test.GetSystemH());
+    cout << selectTest.GetFreeObjects() << endl;
+    cout << selectTest.GetFreeSubjects() << endl;
+    cout << selectTest.GetFullSubjects() << endl;
+    cout << selectTest.GetSubjectsLists() << endl;
+    cout << selectTest.GetSubjectsOneFullObject() << endl;
+
+
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"

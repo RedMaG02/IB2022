@@ -116,6 +116,33 @@ public:
         return subjectsList;
     }
 
+    vector<string> GetFullMatrix()
+    {
+        vector<string> stringList;
+
+        for (int i = 0; i < _n; i++)
+        {
+            string tempString= "";
+            for (int j = 0; j < _m; j++)
+            {
+                pair<int, int> pair = make_pair(i, j);
+                /*for (auto iter = _system[pair].begin(); iter != _system[pair].end(); iter++)
+                {
+                    tempString +=  to_string( *iter) + " ";
+                }*/
+                for (auto c : _system[pair])
+                {
+                    tempString =tempString + c + " ";
+                }
+                tempString += "; ";
+
+            }
+            tempString += "\n";
+            stringList.push_back(tempString);
+        }
+        return stringList;
+    }
+
 };
 
 
@@ -131,12 +158,29 @@ vector<string> split(const string& input, const string& regex)
 
 }
 
+ostream& operator<<(ostream& os, const vector<int>& input)
+{
+    for (auto const& i : input)
+    {
+        os << i << " ";
+    }
+    return os;
+}
+
+ostream& operator<<(ostream& os, const vector<string>& input)
+{
+    for (auto const& i : input)
+    {
+        os << i << " ";
+    }
+    return os;
+}
 
 int main()
 {
     CompactHRU system;
     string systemInputPath = "in1.txt";
-    map <string, int> commandList = { {"ADDS",1},{"DELS",2},{"GETPERC",3},{"GETLIST",4},{"ENTER",5},{"DELENTER",6} };
+    map <string, int> commandList = { {"ADDS",1},{"DELS",2},{"GETPERC",3},{"GETLIST",4},{"ENTER",5},{"DELENTER",6} ,{"GETMATR",7} };
 
     ifstream input(systemInputPath);
 
@@ -182,6 +226,14 @@ int main()
 
     string tempString = "";
 
+    cout << "ADDS name"<<endl;
+    cout << "DELS i"<<endl;
+    cout << "GETPERC" << endl;
+    cout << "GETLIST j" << endl;
+    cout << "ENTER i j p" << endl;
+    cout << "DELENTER i j p" << endl;
+    cout << "GETMATR" << endl;
+
     while (tempString != "EXIT")
     {
         getline(cin, tempString);
@@ -208,7 +260,7 @@ int main()
             cout << "matrix fullness : " << system.GetMatrixFullness() << "%" << endl;
             break;
         case 4:
-            system.GetSubjectsList(atoi(tempVecString[1].c_str())); // перегрузить оператор >> для вектора
+            cout << system.GetSubjectsList(atoi(tempVecString[1].c_str())); // перегрузить оператор >> для вектора
             break;
         case 5:
             system.AddEnter(atoi(tempVecString[1].c_str()), atoi(tempVecString[2].c_str()), tempVecString[3][0]);
@@ -216,6 +268,8 @@ int main()
         case 6:
             system.DeleteEnter(atoi(tempVecString[1].c_str()), atoi(tempVecString[2].c_str()), tempVecString[3][0]);
             break;
+        case 7:
+            cout << system.GetFullMatrix();
         }
     }
 
